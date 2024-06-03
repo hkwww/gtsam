@@ -96,6 +96,31 @@ class GTSAM_EXPORT ISAM2 : public BayesTree<ISAM2Clique> {
   int update_count_;  ///< Counter incremented every update(), used to determine
                       ///< periodic relinearization
 
+  /// \brief Kinetis Added.
+  Values theta_bkq_;
+
+  VariableIndex variableIndex_bkq_;
+
+  mutable VectorValues delta_bkq_;
+
+  mutable VectorValues deltaNewton_bkq_;
+
+  mutable VectorValues RgProd_bkq_;
+
+  mutable KeySet deltaReplacedMask_bkq_;
+
+  NonlinearFactorGraph nonlinearFactors_bkq_;
+
+  mutable GaussianFactorGraph linearFactors_bkq_;
+
+  ISAM2Params params_bkq_;
+
+  mutable boost::optional<double> doglegDelta_bkq_;
+
+  KeySet fixedVariables_bkq_;
+
+  int update_count_bkq_;
+
  public:
   using This = ISAM2;                       ///< This class
   using Base = BayesTree<ISAM2Clique>;      ///< The BayesTree base class
@@ -178,6 +203,10 @@ class GTSAM_EXPORT ISAM2 : public BayesTree<ISAM2Clique> {
   virtual ISAM2Result update(const NonlinearFactorGraph& newFactors,
                              const Values& newTheta,
                              const ISAM2UpdateParams& updateParams);
+  /// \brief Kinetis Added.
+  void backup();  // to line 199 of ISAM2.h
+
+  void recover();  // to line 200 of ISAM2.h
 
   /** Marginalize out variables listed in leafKeys.  These keys must be leaves
    * in the BayesTree.  Throws MarginalizeNonleafException if non-leaves are
@@ -330,20 +359,20 @@ class GTSAM_EXPORT ISAM2 : public BayesTree<ISAM2Clique> {
  private:
   /** Serialization function */
   friend class boost::serialization::access;
-  template<class ARCHIVE>
-  void serialize(ARCHIVE & ar, const unsigned int /*version*/) {
-      ar & boost::serialization::base_object<BayesTree<ISAM2Clique> >(*this);
-      ar & BOOST_SERIALIZATION_NVP(theta_);
-      ar & BOOST_SERIALIZATION_NVP(variableIndex_);
-      ar & BOOST_SERIALIZATION_NVP(delta_);
-      ar & BOOST_SERIALIZATION_NVP(deltaNewton_);
-      ar & BOOST_SERIALIZATION_NVP(RgProd_);
-      ar & BOOST_SERIALIZATION_NVP(deltaReplacedMask_);
-      ar & BOOST_SERIALIZATION_NVP(nonlinearFactors_);
-      ar & BOOST_SERIALIZATION_NVP(linearFactors_);
-      ar & BOOST_SERIALIZATION_NVP(doglegDelta_);
-      ar & BOOST_SERIALIZATION_NVP(fixedVariables_);
-      ar & BOOST_SERIALIZATION_NVP(update_count_);
+  template <class ARCHIVE>
+  void serialize(ARCHIVE& ar, const unsigned int /*version*/) {
+    ar& boost::serialization::base_object<BayesTree<ISAM2Clique> >(*this);
+    ar& BOOST_SERIALIZATION_NVP(theta_);
+    ar& BOOST_SERIALIZATION_NVP(variableIndex_);
+    ar& BOOST_SERIALIZATION_NVP(delta_);
+    ar& BOOST_SERIALIZATION_NVP(deltaNewton_);
+    ar& BOOST_SERIALIZATION_NVP(RgProd_);
+    ar& BOOST_SERIALIZATION_NVP(deltaReplacedMask_);
+    ar& BOOST_SERIALIZATION_NVP(nonlinearFactors_);
+    ar& BOOST_SERIALIZATION_NVP(linearFactors_);
+    ar& BOOST_SERIALIZATION_NVP(doglegDelta_);
+    ar& BOOST_SERIALIZATION_NVP(fixedVariables_);
+    ar& BOOST_SERIALIZATION_NVP(update_count_);
   }
 
 };  // ISAM2

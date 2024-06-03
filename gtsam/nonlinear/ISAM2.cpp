@@ -16,13 +16,12 @@
  * @author  Michael Kaess, Richard Roberts, Frank Dellaert
  */
 
-#include <gtsam/nonlinear/ISAM2-impl.h>
-#include <gtsam/nonlinear/ISAM2.h>
-#include <gtsam/nonlinear/ISAM2Result.h>
-
 #include <gtsam/base/debug.h>
 #include <gtsam/base/timing.h>
 #include <gtsam/inference/BayesTree-inst.h>
+#include <gtsam/nonlinear/ISAM2-impl.h>
+#include <gtsam/nonlinear/ISAM2.h>
+#include <gtsam/nonlinear/ISAM2Result.h>
 #include <gtsam/nonlinear/LinearContainerFactor.h>
 
 #include <algorithm>
@@ -390,6 +389,40 @@ void ISAM2::removeVariables(const KeySet& unusedKeys) {
     theta_.erase(key);
     fixedVariables_.erase(key);
   }
+}
+
+void ISAM2::backup() {
+  variableIndex_bkq_ = variableIndex_;
+  theta_bkq_ = theta_;
+  delta_bkq_ = delta_;
+  deltaNewton_bkq_ = deltaNewton_;
+  RgProd_bkq_ = RgProd_;
+  nonlinearFactors_bkq_ = nonlinearFactors_;
+  fixedVariables_bkq_ = fixedVariables_;
+  update_count_bkq_ = update_count_;
+  deltaReplacedMask_bkq_ = deltaReplacedMask_;
+  linearFactors_bkq_ = linearFactors_;
+  doglegDelta_bkq_ = doglegDelta_;
+  params_bkq_ = params_;
+  // nodes_bkq_ = nodes_;
+  // roots_bkq_ = roots_;
+}
+
+void ISAM2::recover() {
+  variableIndex_ = variableIndex_bkq_;
+  theta_ = theta_bkq_;
+  delta_ = delta_bkq_;
+  deltaNewton_ = deltaNewton_bkq_;
+  RgProd_ = RgProd_bkq_;
+  nonlinearFactors_ = nonlinearFactors_bkq_;
+  fixedVariables_ = fixedVariables_bkq_;
+  update_count_ = update_count_bkq_;
+  deltaReplacedMask_ = deltaReplacedMask_bkq_;
+  linearFactors_ = linearFactors_bkq_;
+  doglegDelta_ = doglegDelta_bkq_;
+  params_ = params_bkq_;
+  // nodes_ = nodes_bkq_;
+  // roots_ = roots_bkq_;
 }
 
 /* ************************************************************************* */
